@@ -17,7 +17,7 @@ namespace StarterAssets
 		[Tooltip("Sprint speed of the character in m/s")]
 		public float SprintSpeed = 6.0f;
 		[Tooltip("Rotation speed of the character")]
-		public float RotationSpeed = 1.0f;
+		public float RotationSpeed = 0.5f;
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
 
@@ -131,24 +131,20 @@ namespace StarterAssets
 
 		private void CameraRotation()
 		{
-			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold)
-			{
-				//Don't multiply mouse input by Time.deltaTime
-				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+    		if (_input.look.sqrMagnitude < _threshold)
+        	return;
 
-				// clamp our pitch rotation
-				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+    		float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 
-				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+    	float lookX = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+    	float lookY = _input.look.y * RotationSpeed * deltaTimeMultiplier;
 
-				// rotate the player left and right
-				transform.Rotate(Vector3.up * _rotationVelocity);
-			}
+    	_cinemachineTargetPitch += lookY;
+    	_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+
+    	CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+
+    	transform.Rotate(Vector3.up * lookX);
 		}
 
 		private void Move()
